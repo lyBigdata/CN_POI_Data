@@ -134,7 +134,7 @@ class parser(object):
                                     #print link.get("href")
                                     poi_data_url.append(link.get("href"))
 
-                        #遍历各个抓取链接，解析数据
+                        #遍历各个抓取链接，解析数据 /poi/18659168.html
                         for url in poi_data_url:
                             pass
 
