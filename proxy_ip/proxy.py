@@ -26,30 +26,35 @@ class proxy(object):
         #print self.all_page_count
         #print type(self.all_page_count)
 
-        f = open(self.fileName,"a")
-
         for a in range(1,self.all_page_count):
             thisurl = self.url+str(a)
             print thisurl
             thispage = spider.spider().getPage(thisurl)
             thissoup = BeautifulSoup(thispage)
             ips = thissoup.findAll('tr')
+            try:
+                f = open(self.fileName,"a")
+                for x in range(1,len(ips)):
+                    ip = ips[x]
+                    tds = ip.findAll("td")
+                    #提取代理ip
+                    host = tds[1].contents[0]
+                    #代理ip端口
+                    port = tds[2].contents[0]
+                    #代理ip使用的协议
+                    protocol = tds[5].contents[0]
 
-            for x in range(1,len(ips)):
-                ip = ips[x]
-                tds = ip.findAll("td")
-                #提取代理ip
-                host = tds[1].contents[0]
-                #代理ip端口
-                port = tds[2].contents[0]
-                #代理ip使用的协议
-                protocol = tds[5].contents[0]
+                    #检测ip的可用性,如果可用就写文件
+                    if self.checkAlive(ip=host,port=port,protocol=protocol):
+                        ip_temp = host+"\t"+port+"\t"+protocol+"\n"
+                        print ip_temp
+                        f.write(ip_temp)
 
-                #检测ip的可用性,如果可用就写文件
-                if self.checkAlive(ip=host,port=port,protocol=protocol):
-                    ip_temp = host+"\t"+port+"\t"+protocol+"\n"
-                    print ip_temp
-                    #f.write(ip_temp)
+            except Exception,e:
+                print e.message
+            finally:
+                if not f.closed:
+                    f.close()
 
     def checkAlive(self,ip,port,protocol):
         testUrl = "https://www.baidu.com/"
@@ -59,6 +64,7 @@ class proxy(object):
         proxyHost = ""
         if protocol == 'HTTP' or protocol == 'HTTPS':
             proxyHost = {"http":r'http://%s:%s' % (ip, port)}
+            #print proxyHost
 
         proxyHandler = urllib2.ProxyHandler(proxyHost)
         opener = urllib2.build_opener(cookies, proxyHandler)
@@ -79,5 +85,10 @@ class proxy(object):
 if __name__=="__main__":
     url = 'http://www.xicidaili.com/nn/'
     filename = "F:/proxy/proxy.txt"
+
+    #不使用使用代理抓取
     page = spider.spider().getPage(url)
+
+    #使用代理抓取
+    #page = spider.spider(proxyHost="http://125.46.64.91:8080").getPageByProxy(url)
     proxy(url,filename).parserIpData(page)
