@@ -4,10 +4,12 @@ import urllib2
 
 class spider(object):
     def __init__(self):
-        #设置ua
-        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.75 Safari/537.36'
         #初始化headers
-        self.headers = {'User-Agent' : self.user_agent}
+        self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.75 Safari/537.36',
+                        'Accept-Charset':'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                        'Accept-Encoding':'en-us',
+                        'Connection':'keep-alive',
+                        'Referer':'http://www.baidu.com/'}
 
     def  getPage(self,url):
         try:
