@@ -136,7 +136,28 @@ class parser(object):
 
                         #遍历各个抓取链接，解析数据 /poi/18659168.html
                         for url in poi_data_url:
-                            pass
+                            result_url = self.url+str(url)
+                            result_pageCode = spider.spider().getPage(result_url)
+                            soup = BeautifulSoup(result_pageCode)
+
+                            find_h1 = soup.find("h1")
+                            #print find_h1
+                            print "具体地址:"+str(unicode(find_h1.string))
+
+                            result_set = soup.find_all(name='li', attrs={"class": "list-group-item"})
+                            print result_set
+
+                            for dizhi in result_set:
+                                s = str(unicode(dizhi))
+                                start_index = s.index(u'<span class="text-muted">') + len(
+                                    u'<span class="text-muted">')
+                                end_index = s.index(u'</span>')-1
+
+                                res_str = str(s)[start_index:end_index]
+
+                                print res_str
+
+
 
 
 if __name__ == "__main__":
