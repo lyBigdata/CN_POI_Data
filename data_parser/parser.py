@@ -134,31 +134,75 @@ class parser(object):
                                     #print link.get("href")
                                     poi_data_url.append(link.get("href"))
 
-                        #遍历各个抓取链接，解析数据 /poi/18659168.html
+                        #遍历各个最终的数据抓取链接，解析数据 /poi/18659168.html
                         for url in poi_data_url:
+                            result_map = {}
+
                             result_url = self.url+str(url)
                             result_pageCode = spider.spider().getPage(result_url)
                             soup = BeautifulSoup(result_pageCode)
 
                             find_h1 = soup.find("h1")
                             #print find_h1
-                            print "具体地址:"+str(unicode(find_h1.string))
+
+                            address = str(unicode(find_h1.string))
+
+                            #print "具体地址:" + address
+
+                            result_map["具体地址:"] = address
 
                             result_set = soup.find_all(name='li', attrs={"class": "list-group-item"})
-                            print result_set
+                            #print result_set
 
                             for dizhi in result_set:
                                 s = str(unicode(dizhi))
-                                start_index = s.index(u'<span class="text-muted">') + len(
+                                start_index_key = s.index(u'<span class="text-muted">') + len(
                                     u'<span class="text-muted">')
-                                end_index = s.index(u'</span>')-1
+                                end_index_key = s.index(u"</span>")
 
-                                res_str = str(s)[start_index:end_index]
+                                #中文字符处理
+                                res_str_key = s.decode("utf-8")[start_index_key:end_index_key].encode("utf-8")
+                                #print res_str_key
 
-                                print res_str
+                                res_str_value = ""
 
+                                if s.find(u"<a href=") == -1:  #不存在 </span> </li>
+                                    start_index_value = s.index(u'</span>') + len(u"</span>")
+                                    end_index_value = s.index(u"</li>")
+                                    res_str_value = s.decode("utf-8")[start_index_value:end_index_value].encode("utf-8")
+                                else: #POI数据">黑龙江省</a>
+                                    start_index_value = s.index(u'POI数据">') + len(u'POI数据">')
+                                    end_index_value = s.index(u"</a>")
+                                    res_str_value = s.decode("utf-8")[start_index_value:end_index_value].encode("utf-8")
+                                #print res_str_value
 
+                                #print res_str_key + res_str_value
 
+                                result_map[res_str_key] = res_str_value
+
+                            print "-----------------------------------------"
+
+                            '''
+                            具体地址:白卡鲁山
+                            所属省份:黑龙江省
+                            所属城市:大兴安岭地区
+                            所属区县:塔河县
+                            详细地址: 大兴安岭地区塔河县
+                            电话号码:
+                            所属分类:
+                            所属标签:
+                            大地坐标: 123.327993,52.352900
+                            火星坐标: 123.335920,52.354399
+                            百度坐标: 123.342390,52.360519
+                            '''
+                            for key in result_map:
+                                print key+result_map[key]
+
+"""
+数据从抓取解析已基本完成，目前的效率略低，还存在很多问题，如何动态使用代理，分布式抓取，优化结构，抓取各个模块的程序间应并行工作，
+如抓取总链接的进程只负责抓取总链接，抓取完成解析后保存到redis中；负责具体数据抓取解析的进程不断从redis中轮询新的尚未被抓取过得连接，
+负责具体数据的抓取解析
+"""
 
 if __name__ == "__main__":
     #使用代理ip抓取
