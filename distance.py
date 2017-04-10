@@ -1,18 +1,4 @@
-#!/usr/bin/env python
 # -*- coding:utf-8 -*-
-
-
-# Created by zhenzi.
-# User: zhenzi
-# Date: 2016/12/20
-# Time: 20:13
-# Verdor: NowledgeData
-# To change this template use File | Settings | File Templates.
-#
-
-__author__ = "zhenzi"
-
-
 
 from math import *
 from geopy.distance import vincenty
